@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+    <title>Czasowniki nieregularne - angielski</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            text-align: center;
+        }
+        .correct {
+            color: darkgreen;
+            background-color: lightgreen;
+        }
+        .incorrect {
+            color: darkred;
+            background-color: lightcoral;
+            text-decoration: line-through;
+        }
+        .question p {
+            font-size: 1.5em;
+            margin-top: 50px;
+        }
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            min-height: 40px;
+        }
+        input {
+            text-align: center;
+            width: 120px;
+            height: 30px;
+            font-size: 1em;
+        }
+        .emoji {
+            font-size: 1.2em;
+            width: 20px;
+            text-align: center;
+            display: inline-block;
+        }
+        .button-container {
+            margin-top: 20px;
+        }
+        button {
+            font-size: 1em;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: "Nunito", sans-serif;
+            text-transform: uppercase;
+            color: white;
+            background-color: rgb(59, 121, 80);
+        }
+    </style>
+</head>
+<body>
+    <h1>Czasowniki nieregularne - angielski</h1>
+    <form id="verb-test"></form>
+    <div class="button-container">
+        <button type="button" class="check-button" onclick="checkAnswers()">Sprawdź</button>
+        <button type="button" class="next-button" onclick="loadNewVerb()">Następny</button>
+    </div>
+    
+<script>
+    var verbs = [
+        {verb: "become", forms: ["became", "become"], translations: ["stawać się", "zostać"]},
+        {verb: "begin", forms: ["began", "begun"], translations: ["zaczynać", "rozpoczynać", "zacząć", "rozpocząć"]},
+        {verb: "bite", forms: ["bit", "bitten"], translations: ["gryźć", "ugryźć"]},
+        {verb: "break", forms: ["broke", "broken"], translations: ["łamać", "rozbić", "zepsuć", "psuć", "złamać"]},
+        {verb: "bring", forms: ["brought", "brought"], translations: ["przynosić", "przynieść"]},
+        {verb: "build", forms: ["built", "built"], translations: ["budować", "zbudować"]},
+        {verb: "buy", forms: ["bought", "bought"], translations: ["kupować", "kupić"]},
+        {verb: "catch", forms: ["caught", "caught"], translations: ["łapać", "złapać"]}
+    ];
+    
+    var form = document.getElementById('verb-test');
+    var currentVerb = null;
+
+    function loadNewVerb() {
+        form.innerHTML = "";
+        currentVerb = verbs[Math.floor(Math.random() * verbs.length)];
+
+        var questionDiv = document.createElement('div');
+        questionDiv.className = 'question';
+
+        var questionP = document.createElement('p');
+        questionP.textContent = currentVerb.verb;
+        questionDiv.appendChild(questionP);
+
+        var fields = ["Past Simple", "Past Participle", "Tłumaczenie"];
+        fields.forEach(function(field, i) {
+            let wrapper = document.createElement('div');
+            wrapper.classList.add('input-wrapper');
+
+            let labelSpan = document.createElement('span');
+            labelSpan.textContent = field;
+            labelSpan.style.width = "150px";
+            labelSpan.style.textAlign = "right";
+
+            let inputField = document.createElement('input');
+            inputField.type = 'text';
+            inputField.dataset.answer = i < 2 ? currentVerb.forms[i] : currentVerb.translations.join("|");
+
+            let emojiSpan = document.createElement('span');
+            emojiSpan.classList.add('emoji');
+
+            wrapper.appendChild(labelSpan);
+            wrapper.appendChild(inputField);
+            wrapper.appendChild(emojiSpan);
+            questionDiv.appendChild(wrapper);
+        });
+
+        form.appendChild(questionDiv);
+    }
+
+    function checkSingleAnswer(input) {
+        let emojiSpan = input.nextElementSibling;
+        let correctAnswers = input.dataset.answer.toLowerCase().split("|");
+
+        if (correctAnswers.includes(input.value.toLowerCase().trim())) {
+            input.classList.add('correct');
+            input.classList.remove('incorrect');
+            emojiSpan.textContent = '✔️';
+        } else {
+            input.classList.add('incorrect');
+            input.classList.remove('correct');
+            emojiSpan.textContent = '❌';
+        }
+    }
+
+    function checkAnswers() {
+        document.querySelectorAll('input').forEach(checkSingleAnswer);
+    }
+
+    function allFieldsCorrect() {
+        return Array.from(document.querySelectorAll('input')).every(input => input.classList.contains('correct'));
+    }
+
+    function getActiveField() {
+        return document.activeElement;
+    }
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+
+            // Check if all fields are correct
+            if (allFieldsCorrect()) {
+                loadNewVerb(); // Load the next question if all fields are correct
+            } else {
+                let activeField = getActiveField();
+                
+                // Check if the active field is an input field
+                if (activeField && activeField.tagName === "INPUT") {
+                    checkSingleAnswer(activeField); // Check only the active field
+                }
+            }
+        }
+    });
+
+    loadNewVerb();
+</script>
+
+
+</body>
+</html>
